@@ -21,7 +21,24 @@ bool Branje_Stevil(vector<unsigned char> &A, const char s[]) {
 }
 
 void Counting_sort_By_Bit(vector<unsigned char> &A, int BitIndex){
+    vector<unsigned char> B(A.size());
+    int C[2] = {0, 0};
 
+    //1.korak: C[(A[i] >> k) & 1]++
+    for (unsigned char num: A) {
+        C[(num >> BitIndex) & 1]++;
+    }
+
+    //2.Korak: Prefix sum
+    C[1] += C[0];
+
+    //3.Korak: B[--C[(A[i] >> k) & 1]] = A[i]   -   Razvrscanje (Od zadnjega proti prvemu za stabilnost)
+    for (int i = A.size() - 1; i >= 0; i--){
+        B[--C[(A[i] >> BitIndex) & 1]] = A[i];
+    }
+
+    //4.Korak: Zamenjava polj
+    swap(A, B);
 }
 
 void Binary_Radix_Sort(vector<unsigned char> &A) {
