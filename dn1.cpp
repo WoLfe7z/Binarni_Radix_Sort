@@ -20,6 +20,17 @@ bool Branje_Stevil(vector<unsigned char> &A, const char s[]) {
     return true;
 }
 
+void Izpis_Stevil(vector<unsigned char> &A){
+    ofstream output("out.txt");
+    if(!output) return;
+
+    for(unsigned int i = 0; i < A.size(); i++){
+        output << A[i] << ' ';
+    }
+
+    output.close();
+}
+
 void Counting_sort_By_Bit(vector<unsigned char> &A, int BitIndex){
     vector<unsigned char> B(A.size());
     int C[2] = {0, 0};
@@ -57,6 +68,8 @@ int main(int argc, const char* argv[]) {
     if(!Branje_Stevil(A, argv[1])) return 0;
     else
         Binary_Radix_Sort(A);
+
+    Izpis_Stevil(A);
 
     return 0;
 }
