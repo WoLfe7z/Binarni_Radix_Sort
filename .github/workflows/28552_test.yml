@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Preveri obstoj testnih datotek
-        run: |
+        run: | #Poskrbimo, da je napaka.txt ustvarjena
           touch napaka.txt
           if [ ! -f tests/run_tests.sh ]; then
             echo "Manjka run_tests.sh!" > napaka.txt
