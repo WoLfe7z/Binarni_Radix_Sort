@@ -15,7 +15,6 @@ jobs:
 
       - name: Preveri obstoj testnih datotek
         run: | #Poskrbimo, da je napaka.txt ustvarjena
-	  #Ustvari ali prepiši napaka.txt
           echo -n "" > napaka.txt
           if [ ! -f tests/run_tests.sh ]; then
             echo "Manjka run_tests.sh!" > napaka.txt
@@ -54,7 +53,6 @@ jobs:
 
       - name: Preveri napake
         run: |
- 	  #Če vsebina ni "OK", potem so se pojavile napake
           if grep -qv "^OK$" napaka.txt; then
             echo "Napaka pri preverjanju testov:"
             cat napaka.txt
