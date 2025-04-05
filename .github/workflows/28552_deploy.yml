@@ -1,0 +1,35 @@
+name: Deploy na DockerHub
+
+on:
+  workflow_run:
+    workflows: ["Testiranje Radix Sort"]  #Se sprozi, ko se prejsnji workflow konca
+    types:
+      - completed
+
+jobs:
+  build_and_deploy:
+    runs-on: self-hosted
+    needs: preveri_teste  #Testi se morajo pravilno izvesti
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v3
+
+      - name: Prijava v DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}   #DockerHub uporabniško ime
+          password: ${{ secrets.DOCKER_PASSWORD }}   #DockerHub geslo
+
+      - name: Gradnja Docker slike
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/Binarni_Radix_Sort:${{ github.sha }} .
+      
+      - name: Pushing Docker slike na DockerHub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/Binarni_Radix_Sort:${{ github.sha }}
+
+      - name: Potisni najnovejsi DockerHub
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/Binarni_Radix_Sort:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/Binarni_Radix_Sort:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/Binarni_Radix_Sort:latest

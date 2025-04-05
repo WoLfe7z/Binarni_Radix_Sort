@@ -1,58 +1,61 @@
 name: Testiranje Radix Sort
 
 on:
-  	push:
-    		branches: [ "CI/CD" ]
-  	pull_request:
-    		branches: [ "main" ]
-    
+  push:
+    branches: [ "CI/CD" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
-	preveri_teste:
-		runs-on: self-hosted
-		steps:
-			uses: actions/checkout@v3
-			name: Preveri obstoj
-			run: |
-				touch napaka.txt
-          			if [ ! -f tests/run_tests.sh ]; then
-            				echo "Manjka run_tests.sh!" > napaka.txt
-          			fi
+  preveri_teste:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v3
 
-          			if ! ls tests/*_input.txt 1> /dev/null 2>&1; then
-            				echo "Manjkajo testni inputi!" >> napaka.txt
-          			fi
+      - name: Preveri obstoj testnih datotek
+        run: |
+          touch napaka.txt
+          if [ ! -f tests/run_tests.sh ]; then
+            echo "Manjka run_tests.sh!" > napaka.txt
+          fi
 
-          			if ! ls tests/*_expected.txt 1> /dev/null 2>&1; then
-            				echo "Manjkajo expected outputi!" >> napaka.txt
-          			fi
-          		
-          		name: Shrani artefakte
-          		run: actions/upload-artifact@v3
-          		with:
-          			name: napaka
-          			path: napaka.txt
-        izvedi_teste:
-        	runs-on: self-hosted
-        	needs: preveri_teste
-        	steps:
-        		name: Checkout
-        		uses: actions/checkout@v3
-        		
-        		name: Prenesi artefakte
-        		uses: actions/download-artifact@v3
-        		with:
-        			name: napaka
-        			
-        		name: Preveri napake
-        		run: |
-        			if [ -s napaka.txt] then
-        				echo "Napaka pri preverjanju testov:"
-        				cat napaka.txt
-        				exit 1
-        			fi
-        		
-        		name: Dodajanje pravic
-        		run: chmod +x tests/run_tests.sh
-        		
-        		name: Zazeni
-        		run: ./tests/run_tests.sh
+          if ! ls tests/*_input.txt 1> /dev/null 2>&1; then
+            echo "Manjkajo testni inputi!" >> napaka.txt
+          fi
+
+          if ! ls tests/*_expected.txt 1> /dev/null 2>&1; then
+            echo "Manjkajo expected outputi!" >> napaka.txt
+          fi
+
+      - name: Shrani artefakte
+        uses: actions/upload-artifact@v3
+        with:
+          name: napaka
+          path: napaka.txt
+
+  izvedi_teste:
+    runs-on: self-hosted
+    needs: preveri_teste
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v3
+
+      - name: Prenesi artefakte (napaka.txt)
+        uses: actions/download-artifact@v3
+        with:
+          name: napaka
+
+      - name: Preveri napake
+        run: |
+          if [ -s napaka.txt ]; then
+            echo "Napaka pri preverjanju testov:"
+            cat napaka.txt
+            exit 1
+          fi
+
+      - name: Dodajanje pravic za izvajanje
+        run: chmod +x tests/run_tests.sh
+
+      - name: Zaženi teste
+        run: ./tests/run_tests.sh
