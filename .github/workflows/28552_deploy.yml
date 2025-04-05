@@ -4,10 +4,10 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 on:
-  push:
-    branches: [ "CI/CD" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["Testiranje Radix Sort"]
+    types:
+      - completed
 
 jobs:
   build_and_deploy:
@@ -18,13 +18,13 @@ jobs:
 
       - name: Prijava v DockerHub
         run: |
-          sudo docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+          docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
       - name: Gradnja Docker slike
         run: |
-          sudo docker build -t $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }} .
+          docker build -t $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }} .
 
       - name: Pushing Docker slike na DockerHub
         run: |
-          sudo docker push $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }}
+          docker push $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }}
 
