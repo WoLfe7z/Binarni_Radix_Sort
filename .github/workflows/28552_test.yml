@@ -2,7 +2,7 @@ name: Testiranje Radix Sort
 
 on:
   	push:
-    		branches: [ "main" ]
+    		branches: [ "CI/CD" ]
   	pull_request:
     		branches: [ "main" ]
     
