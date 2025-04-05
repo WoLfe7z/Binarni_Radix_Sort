@@ -4,10 +4,10 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 on:
-  workflow_run:
-    workflows: ["Testiranje Radix Sort"]
-    types:
-      - completed
+  push:
+    branches: [ "CI/CD" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build_and_deploy:
