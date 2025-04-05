@@ -15,7 +15,8 @@ jobs:
 
       - name: Preveri obstoj testnih datotek
         run: | #Poskrbimo, da je napaka.txt ustvarjena
-          touch napaka.txt
+	  #Ustvari ali prepiši napaka.txt
+          echo -n "" > napaka.txt
           if [ ! -f tests/run_tests.sh ]; then
             echo "Manjka run_tests.sh!" > napaka.txt
           fi
@@ -26,6 +27,11 @@ jobs:
 
           if ! ls tests/*_expected.txt 1> /dev/null 2>&1; then
             echo "Manjkajo expected outputi!" >> napaka.txt
+          fi
+          
+          #Če ni napak, zapiši "OK"
+          if [ ! -s napaka.txt ]; then
+            echo "OK" > napaka.txt
           fi
 
       - name: Shrani artefakte
@@ -48,12 +54,12 @@ jobs:
 
       - name: Preveri napake
         run: |
-          if [ -s napaka.txt ]; then
+ 	  #Če vsebina ni "OK", potem so se pojavile napake
+          if grep -qv "^OK$" napaka.txt; then
             echo "Napaka pri preverjanju testov:"
             cat napaka.txt
             exit 1
           fi
-
       - name: Dodajanje pravic za izvajanje
         run: chmod +x tests/run_tests.sh
 
