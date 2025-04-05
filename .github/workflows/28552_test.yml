@@ -34,7 +34,7 @@ jobs:
           fi
 
       - name: Shrani artefakte
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.4
         with:
           name: napaka
           path: napaka.txt
