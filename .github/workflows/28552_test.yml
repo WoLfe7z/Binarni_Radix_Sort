@@ -1,5 +1,6 @@
 name: Testiranje Radix Sort
 
+#Workflow se zazene ob push in pull request na mejo main
 on:
   push:
     branches: [ "main" ]
@@ -8,13 +9,13 @@ on:
 
 jobs:
   preveri_teste:
-    runs-on: self-hosted
+    runs-on: self-hosted #Uporabimo lokalnega runnerja
     steps:
-      - name: Checkout kode
+      - name: Checkout kode #Preverimo ali imamo najnovejšo različico kode
         uses: actions/checkout@v4
 
-      - name: Preveri obstoj testnih datotek
-        run: | #Poskrbimo, da je napaka.txt ustvarjena
+      - name: Preveri obstoj testnih datotek #Poskrbimo, da je napaka.txt ustvarjena
+        run: | 
           echo -n "" > napaka.txt
           if [ ! -f tests/run_tests.sh ]; then
             echo "Manjka run_tests.sh!" > napaka.txt
@@ -33,33 +34,38 @@ jobs:
             echo "OK" > napaka.txt
           fi
 
-      - name: Shrani artefakte
+      - name: Shrani artefakte #Shrani datoteko napaka.txt
         uses: actions/upload-artifact@v4
         with:
           name: napaka
           path: napaka.txt
 
   izvedi_teste:
-    runs-on: self-hosted
+    runs-on: self-hosted #Tudi ta job se izvaja na našem lokalnem runnerju
     needs: preveri_teste
+    
+    strategy: #Definiramo matriko za izvajanje treh testov
+      matrix:
+        test: [test1, test2, test3]
+        
     steps:
       - name: Checkout kode
         uses: actions/checkout@v4
 
-      - name: Prenesi artefakte (napaka.txt)
+      - name: Prenesi artefakte (napaka.txt) #Prenesemo napaka.txt
         uses: actions/download-artifact@v4
         with:
           name: napaka
 
-      - name: Preveri napake
+      - name: Preveri napake #Preverimo, ali so bile pri testih napake
         run: |
           if grep -qv "^OK$" napaka.txt; then
             echo "Napaka pri preverjanju testov:"
             cat napaka.txt
             exit 1
           fi
-      - name: Dodajanje pravic za izvajanje
+      - name: Dodajanje pravic za izvajanje #Dodelimo pravice za izvajanje skripte
         run: chmod +x tests/run_tests.sh
 
-      - name: Zaženi teste
-        run: ./tests/run_tests.sh
+      - name: Zaženi teste #Zazenemo teste
+        run: ./tests/run_tests.sh ${{ matrix.test }}

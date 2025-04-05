@@ -4,27 +4,27 @@ env: #Pridobimo username in password od dockerhub repozitorija
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 on:
-  workflow_run:
+  workflow_run: #Zazene se, ce se prvi workflow uspesno konca
     workflows: ["Testiranje Radix Sort"]
     types:
       - completed
 
 jobs:
   build_and_deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted #Uporabimo lokalnega runnerja
     steps:
       - name: Checkout kode
         uses: actions/checkout@v4
 
-      - name: Prijava v DockerHub
+      - name: Prijava v DockerHub #Prijavimo se v dockerHub repozitorij
         run: |
           docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
-      - name: Gradnja Docker slike
+      - name: Gradnja Docker slike #Zgradimo docker sliko
         run: |
           docker build -t $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }} .
 
-      - name: Pushing Docker slike na DockerHub
+      - name: Pushing Docker slike na DockerHub #Posljemo docker sliko na dockerHub repozitorij
         run: |
           docker push $DOCKER_USERNAME/binarni_radix_sort:${{ github.sha }}
 
